@@ -68,4 +68,4 @@ yarl==1.13.1
 langchain-community
 openai
 tiktoken
-faiss-gpu
+faiss-cpu
