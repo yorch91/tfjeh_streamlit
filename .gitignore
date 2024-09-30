@@ -1,0 +1,10 @@
+# Ignorar el entorno virtual
+nuevoenv/
+Versiones/
+
+.env
+
+# Archivos de caché y configuraciones locales
+__pycache__/
+*.pyc
+.DS_Store

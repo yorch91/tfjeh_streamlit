@@ -1,0 +1,1159 @@
+--- COMIENZO UNIDAD 1: Introducción y Conceptos Básicos ---
+Guía de Programación en C - Introducción y Conceptos Básicos
+@tema: Introducción al Lenguaje C
+@etiquetas: C, programación, ANSI, variables, constantes, tipos de datos
+
+1. Introducción al Lenguaje C
+El lenguaje C evolucionó a partir de los lenguajes BCPL y B, y fue implementado en 1972 por Dennis Ritchie en los laboratorios Bell. Originalmente utilizado para el desarrollo del sistema operativo UNIX, se convirtió en un lenguaje de programación de uso general y alta portabilidad, lo que lo hizo popular para sistemas operativos y software en distintas plataformas de hardware.
+
+@ejemplo: Ejemplo del uso de C en sistemas operativos como UNIX.
+
+Características Claves del Lenguaje C
+Portabilidad: C es independiente del hardware, lo que permite escribir programas portables para diversas plataformas.
+Uso de Librerías Externas: El manejo de entrada/salida y memoria se realiza mediante funciones contenidas en librerías externas, lo que facilita la independencia del hardware.
+@ejemplo: Uso de librerías externas como stdio.h para manejo de entrada/salida.
+
+2. Variables y Aritmética en C
+Tipos de Objetos
+Constantes: Un objeto cuyo valor no cambia durante la ejecución del programa.
+Variables: Un objeto cuyo valor puede cambiar a lo largo del programa.
+@ejemplo: Diferencia entre constantes y variables en C.
+
+Declaración de Variables
+En C, las variables deben ser declaradas antes de ser usadas, especificando su tipo y nombre. Por ejemplo:
+
+c
+Copiar código
+int multiplicador = 1000;
+int multiplicando = 2;
+@ejemplo: Ejemplo de declaración e inicialización de variables en C.
+
+3. Operaciones Aritméticas y Función printf()
+El lenguaje C permite realizar operaciones aritméticas simples. La función printf() es utilizada para mostrar el resultado de estas operaciones en pantalla.
+
+Ejemplo de Programa
+c
+Copiar código
+#include <stdio.h>
+
+int main() {
+    int multiplicador = 1000;
+    int multiplicando = 2;
+    printf("Resultado = %d\n", multiplicando * multiplicador);
+    return 0;
+}
+Este programa multiplica dos números y muestra el resultado en pantalla.
+
+@ejemplo: Ejemplo de uso de la función printf() para mostrar resultados.
+
+4. Constantes en C
+Tipos de Constantes
+Constantes de Carácter: Representan un solo carácter, como 'a' o '\n'.
+Constantes Enteras: Valores numéricos enteros como 5, +5, -5.
+Constantes Reales: Números con decimales como 0.5, 5.0e-01.
+Cadenas de Texto: Conjunto de caracteres delimitados por comillas dobles, como "Hola Mundo".
+@ejemplo: Ejemplos de constantes en C.
+
+5. Constantes Simbólicas
+En lugar de usar constantes literales, es recomendable utilizar constantes simbólicas mediante la directiva #define para mejorar la legibilidad y mantenimiento del código.
+
+Ejemplo de Constantes Simbólicas
+c
+Copiar código
+#define PI 3.1416
+#define VALOR_CONSTANTE 342
+@ejemplo: Uso de #define para definir constantes simbólicas.
+
+6. Estructura de un Programa en C
+Un programa en C sigue una estructura básica que incluye la declaración de librerías, el cuerpo principal con la función main(), y las instrucciones que se ejecutarán dentro del programa.
+
+Ejemplo de un Programa "Hola Mundo"
+c
+Copiar código
+#include <stdio.h>
+
+void main() {
+    printf("Hola Mundo\n");
+}
+@ejemplo: Ejemplo clásico de un programa "Hola Mundo" en C.
+
+7. Tipos de Datos Básicos en C
+Tipos Numéricos
+Entero (int): Utilizado para representar números enteros. Dependiendo del tipo, puede variar su alcance.
+Real (float, double): Para representar números con decimales.
+@ejemplo: Tipos numéricos en C, como int y float.
+
+Tabla de Alcances de Tipos Enteros
+Tipo	Bytes	Mínimo	Máximo
+signed char	1	-128	127
+unsigned char	1	0	255
+signed short	2	-32,768	+32,767
+unsigned short	2	0	+65,535
+signed int	2	-32,768	+32,767
+unsigned int	2	0	+65,535
+signed long	4	-2,147,483,648	+2,147,483,647
+unsigned long	4	0	+4,294,967,295
+@ejemplo: Tabla con los alcances de diferentes tipos de variables enteras.
+
+8. Variables de Punto Flotante
+Tipos de Punto Flotante
+Tipo	Bytes	Mínimo	Máximo
+float	4	3.4E-38	3.4E+38
+double	8	1.7E-308	1.7E+308
+long double	10	3.4E-4932	3.4E+4932
+@ejemplo: Variables de punto flotante en C.
+
+9. Variables de Tipo Carácter
+Las variables de tipo carácter en C utilizan el estándar ASCII para representar caracteres.
+
+Secuencias de Escape Comunes
+Secuencia	Significado	Valor ASCII (Dec)	Valor ASCII (Hex)
+'\n'	Nueva línea	10	0x0A
+'\t'	Tabulador	9	0x09
+'\b'	Retroceso	8	0x08
+@ejemplo: Ejemplo de secuencias de escape para caracteres no imprimibles en C.
+
+Este documento está optimizado para su uso en RAG, facilitando la búsqueda y recuperación de información sobre la programación en C, con ejemplos claros y una estructura que permite encontrar rápidamente conceptos clave del lenguaje.
+
+@tema: Introducción al Lenguaje C
+@etiquetas: variables, constantes, tipos de datos, ANSI C, estructura
+
+@tema: Operadores y Expresiones en C
+@etiquetas: operadores, expresiones, aritmética, lógicos, relacionales, incremento, decremento
+
+1. Operadores en C
+C proporciona una variedad de operadores para realizar diferentes tipos de operaciones, tales como:
+
+1.1 Operaciones Aritméticas
+Operadores Binarios: Suma (+), resta (-), multiplicación (*), división (/), resto o módulo (%).
+Operador Unario: Inversión de signo (-).
+@ejemplo: Ejemplo de operaciones aritméticas:
+
+c
+Copiar código
+int num1 = 10, num2 = 3;
+int suma = num1 + num2; // 13
+int resto = num1 % num2; // 1
+1.2 Operaciones Relacionales
+Permiten comparar valores. Los operadores relacionales son:
+
+Igual (==), distinto (!=), mayor que (>), menor que (<), mayor o igual que (>=), menor o igual que (<=).
+@ejemplo: Ejemplo de operaciones relacionales:
+
+c
+Copiar código
+int num1 = 5, num2 = 10;
+bool es_mayor = num1 > num2; // false
+1.3 Operaciones Lógicas
+Permiten combinar expresiones lógicas con los siguientes operadores:
+
+Conjunción (&&), disyunción (||), negación (!).
+@ejemplo: Ejemplo de operaciones lógicas:
+
+c
+Copiar código
+int num1 = 5, num2 = 10;
+bool resultado = (num1 < num2) && (num1 > 0); // true
+1.4 Operadores de Asignación
+Los operadores de asignación permiten asignar el valor de una expresión a una variable. Se pueden simplificar con la siguiente sintaxis:
+
+v <op>= E: Realiza la operación y asigna el resultado a la variable. Ejemplo: v += E es equivalente a v = v + E.
+@ejemplo: Ejemplo de operadores de asignación:
+
+c
+Copiar código
+int x = 5;
+x *= 2; // x = x * 2, resultado: 10
+1.5 Operadores de Incremento y Decremento
+Los operadores de incremento (++) y decremento (--) aumentan o disminuyen el valor de una variable en 1. Estos operadores pueden colocarse antes o después de la variable, y la diferencia radica en cuándo se evalúa el cambio.
+
+Preincremento/Predecremento: Modifica el valor antes de ser utilizado en una expresión.
+Postincremento/Postdecremento: Utiliza el valor actual y luego lo modifica.
+@ejemplo: Ejemplo de incremento y decremento:
+
+c
+Copiar código
+int x = 5;
+int y = ++x; // Preincremento, y = 6, x = 6
+int z = x--; // Postdecremento, z = 6, x = 5
+2. Expresiones en C
+2.1 Definición de Expresión
+Una expresión es una combinación de variables, constantes y operadores que resulta en un valor. Por ejemplo, 1 + 5 es una expresión que produce el valor 6.
+
+@ejemplo: Ejemplo de expresión aritmética:
+
+c
+Copiar código
+int resultado = (10 + 5) * 2; // resultado = 30
+2.2 Tipos de Expresiones
+2.2.1 Expresiones Aritméticas
+Utilizan operadores aritméticos (+, -, *, /, %) para realizar cálculos con variables y constantes.
+
+@ejemplo: Ejemplo de expresión aritmética compleja:
+
+c
+Copiar código
+float x = (-b + sqrt((b * b) - (4 * a * c))) / (2 * a);
+2.2.2 Expresiones Lógicas
+Utilizan operadores lógicos (&&, ||, !) y relacionales (<, >, ==, !=) para evaluar condiciones que resultan en valores booleanos (true o false).
+
+@ejemplo: Ejemplo de expresión lógica:
+
+c
+Copiar código
+bool resultado = (a > b) && (b == c);
+2.3 Combinación de Expresiones
+C permite combinar expresiones aritméticas y lógicas en una misma expresión. El resultado de una expresión lógica (true o false) puede usarse dentro de una expresión aritmética, y viceversa.
+
+@ejemplo: Ejemplo de combinación de expresiones:
+
+c
+Copiar código
+int resultado = (a - b) && (c != d);
+3. Operador de Asignación en Expresiones
+El operador de asignación (=) permite asignar un valor a una variable. En C, las asignaciones también son expresiones, lo que permite encadenarlas.
+
+@ejemplo: Ejemplo de asignación múltiple:
+
+c
+Copiar código
+a = b = c = 10; // a, b y c serán igual a 10
+4. Reglas de Precedencia y Asociatividad
+Cuando una expresión contiene múltiples operadores, C++ sigue reglas de precedencia y asociatividad para determinar el orden en el que se evalúan los operadores.
+
+Reglas Básicas:
+Operadores Unarios: Se evalúan antes que los binarios.
+Precedencia: Los operadores aritméticos (*, /, %) tienen mayor precedencia que los de suma y resta (+, -).
+Asociatividad: Los operadores se evalúan de izquierda a derecha, excepto los unarios, que se evalúan de derecha a izquierda.
+@ejemplo: Ejemplo de expresión con precedencia y asociatividad:
+
+c
+Copiar código
+int resultado = 10 + 5 * 2; // resultado = 20 (se evalúa 5 * 2 primero)
+Este documento está optimizado para su uso en RAG, permitiendo la recuperación de información relacionada con operadores, expresiones y la evaluación de condiciones en C, facilitando el uso de ejemplos y conceptos clave del lenguaje.
+
+@tema: Operadores y Expresiones en C
+@etiquetas: operadores, expresiones, asignación, incremento, precedencia
+--- FIN UNIDAD 1 ---
+
+
+--- COMIENZO UNIDAD 2: Entrada y salida ---
+Guía de Programación en C - Entrada y Salida
+@tema: Entrada y Salida en C
+@etiqueta: Entrada, Salida, getchar, putchar, printf, scanf, formato
+
+1. Acceso a la biblioteca estándar
+En C, las sentencias de entrada y salida no están definidas directamente en el lenguaje, sino que se implementan mediante funciones de la biblioteca estándar incluidas en el archivo stdio.h.
+
+c
+Copiar código
+#include <stdio.h>
+Donde stdio proviene de standard input-output. Esta biblioteca contiene todas las funciones necesarias para que el programa reciba y envíe datos.
+
+2. Entrada y Salida estándar
+2.1 Funciones getchar y putchar
+Las macros getchar() y putchar() permiten leer y escribir caracteres de forma individual. Estas macros se comportan de manera similar a las funciones, pero su código es sustituido por el preprocesador antes de la compilación.
+
+getchar(): Lee un carácter de la entrada estándar (teclado).
+putchar(): Escribe un carácter en la salida estándar (pantalla).
+Ejemplo:
+
+c
+Copiar código
+putchar('a'); // Escribe el carácter 'a'
+c = getchar(); // Equivalente a scanf("%c", &c);
+Uso en un bucle:
+
+c
+Copiar código
+int i = 0, c;
+char name[100];
+while ((c = getchar()) != '\n') {
+    name[i++] = c;
+}
+name[i] = '\0'; // Finaliza la cadena de texto
+@ejemplo: Ejemplo de uso de getchar y putchar.
+
+3. Entrada y Salida con Formato
+3.1 Función printf
+La función printf() permite imprimir texto formateado en la salida estándar. Su forma general es:
+
+c
+Copiar código
+int printf("cadena_de_control", tipo arg1, tipo arg2, ...);
+Donde cadena_de_control contiene el formato de salida y los argumentos son las variables que se desean imprimir.
+
+Ejemplo de uso:
+
+c
+Copiar código
+int i;
+double tiempo;
+float masa;
+
+printf("Resultado nº: %d. En el instante %lf la masa vale %f\n", i, tiempo, masa);
+%d: Formato para enteros.
+%lf: Formato para números de tipo double.
+%f: Formato para números de tipo float.
+Otros modificadores de formato:
+
+%s: Para cadenas de caracteres.
+%ld: Para números de tipo long.
+@ejemplo: Ejemplo de uso de la función printf.
+
+4. Entrada con formato
+4.1 Función scanf
+La función scanf() permite leer datos de la entrada estándar utilizando una cadena de formato similar a la de printf. La sintaxis general es:
+
+c
+Copiar código
+int scanf("%x1%x2...", &arg1, &arg2, ...);
+Donde %x1, %x2 representan los formatos de los datos a leer y los argumentos deben ser pasados por referencia.
+
+Ejemplo de uso:
+
+c
+Copiar código
+int n;
+double distancia;
+char nombre[20];
+
+scanf("%d%lf%s", &n, &distancia, nombre);
+4.2 Uso de corchetes en scanf
+scanf también permite leer caracteres específicos utilizando corchetes. Por ejemplo, la siguiente sentencia lee caracteres hasta encontrar un salto de línea (\n):
+
+c
+Copiar código
+scanf(" %[^\n]", s);
+Esto lee una línea completa de texto, incluyendo espacios.
+
+@ejemplo: Ejemplo de uso de corchetes en scanf.
+
+5. Preguntas Frecuentes (FAQs)
+Pregunta: ¿Cómo puedo leer un carácter del teclado en C?
+Respuesta: Puedes utilizar la macro getchar(), que lee un solo carácter de la entrada estándar. Por ejemplo:
+
+c
+Copiar código
+char c;
+c = getchar();
+Pregunta: ¿Cómo se imprimen variables con printf?
+Respuesta: Puedes imprimir variables utilizando el formato adecuado. Aquí tienes un ejemplo:
+
+c
+Copiar código
+int i = 5;
+printf("El valor de i es: %d", i);  // Imprime el valor de la variable i
+Pregunta: ¿Qué debo tener en cuenta al usar scanf?
+Respuesta: Cuando utilizas scanf(), los argumentos deben pasarse por referencia (excepto las cadenas de caracteres). Por ejemplo:
+
+c
+Copiar código
+int edad;
+scanf("%d", &edad);  // Pasamos la dirección de la variable edad
+6. Errores Comunes y Soluciones
+Error Común: Usar una variable sin inicializar
+Descripción: En C, usar una variable sin inicializar puede generar resultados inesperados.
+
+Solución: Asegúrate de inicializar las variables antes de usarlas. Ejemplo:
+
+c
+Copiar código
+int x;  
+printf("%d", x);  // Error: x no está inicializada
+
+// Solución:
+int x = 0;
+printf("%d", x);  // Correcto: x está inicializada
+Error Común: No pasar una dirección en scanf(). Solución: Asegúrate de pasar la dirección de la variable usando &.
+
+Ejemplo Incorrecto:
+
+c
+Copiar código
+int edad;
+scanf("%d", edad);  // Incorrecto
+Ejemplo Correcto:
+
+c
+Copiar código
+int edad;
+scanf("%d", &edad);  // Correcto
+@tema: Entrada y Salida en C
+@etiqueta: getchar, putchar, printf, scanf, errores comunes, FAQs
+--- FIN UNIDAD 2 ---
+
+--- COMIENZO UNIDAD 3: Estructuras de Control, Selección y Repetición ---
+Guía de Programación en C++ - Estructuras de Control, Selección y Repetición
+@tema: Estructuras de Control y Repetición en C++
+@etiquetas: if, else, switch, while, for, do-while, break, continue, estructuras de control
+
+1. Introducción
+En C++, como en otros lenguajes de programación basados en algoritmos, existen varias estructuras de control que permiten modificar el flujo de ejecución de los programas. Estas estructuras permiten tomar decisiones, repetir acciones y manejar diferentes casos basados en condiciones.
+
+2. Estructuras de Selección: if-else y else-if
+Las estructuras de selección permiten elegir un bloque de código para ejecutarse en función de una condición. En C++, existen dos tipos principales de selección:
+
+Selección simple (if-else)
+Selección múltiple (switch)
+2.1. Estructura if-else
+La estructura if-else ejecuta una acción si una condición es verdadera y otra acción si es falsa. La sintaxis básica es:
+
+cpp
+Copiar código
+if (condición) {
+    // Bloque de código si la condición es verdadera
+} else {
+    // Bloque de código si la condición es falsa
+}
+Ejemplo de uso de if-else:
+cpp
+Copiar código
+int a = 10;
+if (a > 0) {
+    printf("a es positivo");
+} else {
+    printf("a es negativo");
+}
+@ejemplo: Ejemplo simple de if-else.
+
+2.2. Estructura else-if
+La estructura else-if permite encadenar múltiples condiciones, lo que es útil cuando se necesitan varias comprobaciones:
+
+cpp
+Copiar código
+if (condición1) {
+    // Bloque de código si condición1 es verdadera
+} else if (condición2) {
+    // Bloque de código si condición2 es verdadera
+} else {
+    // Bloque de código si ninguna condición es verdadera
+}
+@ejemplo: Ejemplo de else-if encadenado.
+
+2.3. Consejos sobre la indentación y el anidamiento
+Es común anidar sentencias if-else, lo que puede hacer el código difícil de leer. Un buen uso de la indentación y las llaves facilita la comprensión. Aquí un ejemplo con un anidamiento correcto:
+
+cpp
+Copiar código
+if (condición1) {
+    if (condición2) {
+        // Acción 1
+    } else {
+        // Acción 2
+    }
+} else {
+    // Acción 3
+}
+@nota: Recuerda que cada else se empareja con el if más cercano.
+
+3. Selecciones Múltiples: switch
+Cuando se tienen muchas condiciones que evaluar, la estructura switch ofrece una alternativa más eficiente que múltiples sentencias if-else.
+
+3.1. Sintaxis de switch
+La estructura switch evalúa una expresión y ejecuta un bloque de código dependiendo del valor de la expresión. La sintaxis es:
+
+cpp
+Copiar código
+switch (expresión) {
+    case valor1:
+        // Bloque de código si expresión == valor1
+        break;
+    case valor2:
+        // Bloque de código si expresión == valor2
+        break;
+    default:
+        // Bloque de código si ninguna condición es verdadera
+}
+3.2. Ejemplo de uso de switch
+cpp
+Copiar código
+#include <stdio.h>
+
+int main() {
+    char tecla;
+    printf("Pulse una tecla y luego Intro: ");
+    scanf("%c", &tecla);
+
+    switch (tecla) {
+        case ' ':
+            printf("Espacio.\n");
+            break;
+        case '1': case '2': case '3':
+            printf("Dígito.\n");
+            break;
+        default:
+            printf("Ni espacio ni dígito.\n");
+    }
+    return 0;
+}
+@ejemplo: Ejemplo de uso de switch para evaluar una entrada de teclado.
+
+4. Estructuras de Repetición
+Las estructuras de repetición permiten ejecutar un bloque de código varias veces bajo ciertas condiciones. En C++ disponemos de las siguientes estructuras:
+
+for: Repetición con contador.
+while: Repetición con condición al inicio.
+do-while: Repetición con condición al final.
+4.1. Estructura for
+La estructura for se utiliza cuando el número de iteraciones es conocido de antemano.
+
+Sintaxis de for:
+cpp
+Copiar código
+for (inicialización; condición; incremento) {
+    // Bloque de código a repetir
+}
+Ejemplo de uso de for:
+cpp
+Copiar código
+for (int i = 1; i <= 10; i++) {
+    printf("%d ", i);
+}
+4.2. Estructura while
+La estructura while repite el bloque de código mientras la condición sea verdadera.
+
+Sintaxis de while:
+cpp
+Copiar código
+while (condición) {
+    // Bloque de código a repetir
+}
+Ejemplo de uso de while:
+cpp
+Copiar código
+int numero = 5;
+while (numero > 0) {
+    printf("%d\n", numero);
+    numero--;
+}
+@ejemplo: Ejemplo de un bucle while decreciente.
+
+4.3. Estructura do-while
+La estructura do-while ejecuta el bloque de código al menos una vez y luego evalúa la condición.
+
+Sintaxis de do-while:
+cpp
+Copiar código
+do {
+    // Bloque de código a repetir
+} while (condición);
+Ejemplo de uso de do-while:
+cpp
+Copiar código
+int numero;
+do {
+    printf("Teclea un número (0 para salir): ");
+    scanf("%d", &numero);
+} while (numero != 0);
+@ejemplo: Ejemplo de do-while para capturar entrada del usuario.
+
+5. Sentencias de Control de Bucle: break y continue
+5.1. Sentencia break
+La sentencia break se utiliza para salir de un bucle o una estructura switch antes de que esta termine normalmente.
+
+Ejemplo de break en un bucle for:
+cpp
+Copiar código
+for (int i = 1; i <= 10; i++) {
+    if (i == 5) {
+        break;  // Sale del bucle cuando i es igual a 5
+    }
+    printf("%d ", i);
+}
+5.2. Sentencia continue
+La sentencia continue hace que el flujo de control salte a la siguiente iteración del bucle, omitiendo el resto del código en esa iteración.
+
+Ejemplo de continue en un bucle for:
+cpp
+Copiar código
+for (int i = 1; i <= 10; i++) {
+    if (i % 2 == 0) {
+        continue;  // Omite los números pares
+    }
+    printf("%d ", i);
+}
+@ejemplo: Ejemplo de continue para saltar iteraciones en un bucle for.
+
+6. Preguntas Frecuentes (FAQs)
+Pregunta: ¿Cuándo debo usar switch en lugar de if-else?
+Respuesta: Se recomienda usar switch cuando se deben evaluar múltiples posibles valores de una misma variable, ya que resulta más eficiente y legible que una cadena de if-else.
+
+Pregunta: ¿Cuál es la diferencia entre while y do-while?
+Respuesta: La estructura while evalúa la condición antes de ejecutar el bloque de código, mientras que do-while evalúa la condición al final, garantizando al menos una ejecución.
+
+Pregunta: ¿Qué hace la sentencia continue?
+Respuesta: La sentencia continue omite el resto del código en la iteración actual del bucle y salta directamente a la siguiente iteración.
+
+7. Errores Comunes y Soluciones
+Error Común: No inicializar la variable de control en un bucle for
+Solución: Asegúrate de inicializar la variable antes de usarla en el bucle:
+
+cpp
+Copiar código
+for (int i = 0; i < 10; i++) {
+    // Bucle correcto
+}
+Error Común: Olvidar el break en un switch
+Solución: Asegúrate de incluir break en cada caso de un switch para evitar la ejecución de los casos siguientes.
+
+@tema: Estructuras de Control y Repetición
+@etiquetas: if, else, switch, while, for, do-while, break, continue, errores comunes, FAQs
+--- FIN UNIDAD 3 ---
+
+--- COMIENZO UNIDAD 4: Funciones ---
+Guía de Programación en C - Funciones
+@tema: Funciones en C
+@etiquetas: funciones, declaración, parámetros, retorno de valores, paso por valor, paso por referencia, funciones void
+
+1. Conceptos Básicos sobre Funciones
+Las funciones en C permiten dividir un programa en módulos específicos que facilitan la organización y reutilización del código. Las funciones son bloques de código que pueden ser llamados desde cualquier parte del programa, realizando una tarea específica.
+
+Características de las funciones:
+Se declaran: Se establece su prototipo.
+Se definen: Se escribe el código que realiza la tarea.
+Se invocan: Se llaman desde otra parte del programa.
+Pueden devolver valores o ejecutar tareas sin retornar valores.
+Ejemplo básico de función:
+
+c
+Copiar código
+int calcular_cuadrado(int dato) {
+    return dato * dato;
+}
+En este ejemplo, la función calcular_cuadrado toma un número como argumento y devuelve su cuadrado.
+
+@ejemplo: Ejemplo básico de una función que calcula el cuadrado de un número.
+
+2. Declaración de Funciones
+Sintaxis general de una función:
+c
+Copiar código
+tipo nombre_funcion(tipo1 param1, tipo2 param2, ...) {
+    // Declaraciones de variables locales
+    tipo_var1 var1;
+    tipo_var2 var2;
+
+    // Cuerpo de la función
+    return valor;
+}
+Tipo: El tipo de dato que la función devolverá (por ejemplo, int o float).
+Nombre: El identificador de la función.
+Lista de parámetros: Los parámetros que la función recibe.
+@ejemplo: Declaración y definición de una función.
+
+3. Parámetros de una Función
+Los parámetros son los valores que se pasan a la función cuando se llama. Los términos "parámetro" y "argumento" son similares, pero se usan de manera diferente:
+
+Parámetros formales: Los definidos en la declaración de la función.
+Argumentos: Los valores que se pasan a la función en la llamada.
+Ejemplo de función con parámetros:
+c
+Copiar código
+int sumar(int a, int b) {
+    return a + b;
+}
+@ejemplo: Ejemplo de función con dos parámetros formales a y b.
+
+4. Funciones que Devuelven Valores
+4.1. Paso por Valor
+Cuando se pasa un parámetro por valor, se envía una copia del valor original a la función. Cualquier cambio en el parámetro dentro de la función no afecta el valor original.
+
+Ejemplo de paso por valor:
+
+c
+Copiar código
+int duplicar(int x) {
+    x = x * 2;
+    return x;
+}
+En este caso, aunque la variable x se duplica, el valor original fuera de la función no cambia.
+
+4.2. Paso por Referencia
+Cuando se necesita modificar el valor de una variable fuera de la función, se utiliza el paso por referencia, que envía la dirección de memoria de la variable.
+
+Ejemplo de paso por referencia:
+
+c
+Copiar código
+void intercambiar(int *x, int *y) {
+    int temp = *x;
+    *x = *y;
+    *y = temp;
+}
+Aquí, las variables x y y son intercambiadas directamente.
+
+@ejemplo: Ejemplo de paso por referencia usando punteros.
+
+5. Funciones void
+Las funciones de tipo void no devuelven ningún valor. Se utilizan cuando solo se desea realizar una acción, como imprimir un mensaje o modificar una variable sin devolver datos.
+
+Ejemplo de función void:
+
+c
+Copiar código
+void imprimir_mensaje() {
+    printf("Hola, esta es una función void.\n");
+}
+@ejemplo: Ejemplo de función void que imprime un mensaje.
+
+6. Ámbito de Variables y Funciones
+6.1. Variables Locales
+Las variables locales se declaran dentro de una función y solo son accesibles dentro de esa función. Dejan de existir cuando la función termina.
+
+6.2. Variables Globales
+Las variables globales se declaran fuera de cualquier función y son accesibles desde cualquier parte del programa. Tienen un ciclo de vida que dura toda la ejecución del programa.
+
+7. Funciones de Biblioteca
+C proporciona una biblioteca estándar que incluye un conjunto de funciones predefinidas para realizar tareas comunes como operaciones matemáticas, manipulación de cadenas y entrada/salida.
+
+7.1. Ejemplo de uso de funciones de biblioteca:
+c
+Copiar código
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+    double raiz = sqrt(16.0);
+    printf("La raíz cuadrada de 16 es: %.2f\n", raiz);
+    return 0;
+}
+@ejemplo: Ejemplo de uso de la función sqrt() de la biblioteca matemática.
+
+8. Funciones Recursivas
+Las funciones recursivas son aquellas que se llaman a sí mismas para resolver problemas que pueden ser divididos en subproblemas más pequeños.
+
+Ejemplo de función recursiva (factorial):
+c
+Copiar código
+int factorial(int n) {
+    if (n == 1) {
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
+Esta función calcula el factorial de un número utilizando recursión.
+
+@ejemplo: Ejemplo de función recursiva para calcular el factorial de un número.
+
+9. Preguntas Frecuentes (FAQs)
+Pregunta: ¿Qué es una función void?
+Respuesta: Es una función que no devuelve ningún valor. Se utiliza cuando no se espera un resultado, solo una acción.
+
+Pregunta: ¿Cuál es la diferencia entre paso por valor y paso por referencia?
+Respuesta: En el paso por valor se pasa una copia del argumento, mientras que en el paso por referencia se pasa la dirección de la variable, permitiendo modificar el valor original.
+
+Pregunta: ¿Qué es una función recursiva?
+Respuesta: Una función recursiva es aquella que se llama a sí misma para resolver subproblemas más pequeños hasta llegar a una solución final.
+
+10. Errores Comunes y Soluciones
+Error Común: Olvidar inicializar una variable dentro de una función
+Solución: Asegúrate de inicializar todas las variables antes de utilizarlas.
+
+Ejemplo Incorrecto:
+
+c
+Copiar código
+int suma;
+printf("%d", suma);  // Error: la variable no está inicializada.
+Ejemplo Correcto:
+
+c
+Copiar código
+int suma = 0;
+printf("%d", suma);  // Correcto
+@tema: Funciones en C
+@etiquetas: funciones, paso por valor, paso por referencia, recursividad, void, errores comunes, FAQs
+--- FIN UNIDAD 4 ---
+
+--- COMIENZO UNIDAD 5: Punteros y Arreglos ---
+Guía de Programación en C - Punteros y Arreglos
+@tema: Punteros y Arreglos en C
+@etiquetas: punteros, arreglos, declaración, aritmética de punteros, matrices, operaciones con arreglos
+
+1. Punteros: Concepto
+Un puntero es una variable que almacena la dirección de memoria de otra variable. Es decir, su valor es la dirección donde se encuentra almacenado otro dato.
+
+Ejemplo de puntero:
+c
+Copiar código
+int x = 25;
+int *pint = &x;  // 'pint' es un puntero a 'x'
+En este ejemplo, el puntero pint contiene la dirección de la variable x, y *pint accede al valor almacenado en esa dirección.
+
+@ejemplo: Ejemplo de puntero que apunta a una variable int.
+
+2. Declaración de Punteros
+Los punteros se declaran especificando el tipo de dato al que apuntan, seguido de un asterisco *:
+
+c
+Copiar código
+int *punt;  // Puntero a entero
+char *car;  // Puntero a carácter
+Inicialización de punteros:
+c
+Copiar código
+int var = 14;
+int *punt = &var;  // Inicialización del puntero 'punt' con la dirección de 'var'
+@ejemplo: Ejemplo de declaración e inicialización de punteros.
+
+3. Operadores de Punteros
+En C, hay dos operadores fundamentales para trabajar con punteros:
+
+Operador de dirección (&): Obtiene la dirección de una variable.
+Operador de contenido (*): Accede al valor almacenado en la dirección a la que apunta el puntero.
+Ejemplo:
+c
+Copiar código
+int x = 25;
+int *pint = &x;
+
+printf("Dirección de x: %p\n", pint);  // Imprime la dirección de x
+printf("Valor de x: %d\n", *pint);     // Imprime el valor almacenado en x
+@ejemplo: Uso de los operadores & y * con punteros.
+
+4. Aritmética de Punteros
+La aritmética de punteros permite modificar la dirección almacenada en un puntero.
+
+Incremento (++): Aumenta la dirección en función del tamaño del tipo de dato al que apunta el puntero.
+Decremento (--): Disminuye la dirección de la misma manera.
+Ejemplo de aritmética de punteros:
+c
+Copiar código
+int array[5] = {10, 20, 30, 40, 50};
+int *p = array;
+
+p++;  // Apunta al segundo elemento del array
+printf("Segundo elemento: %d\n", *p);
+@ejemplo: Ejemplo de incremento en la aritmética de punteros.
+
+5. Punteros Especiales: void y NULL
+Puntero void: Un puntero que no tiene un tipo específico.
+Puntero NULL: Un puntero que no apunta a ningún objeto o dirección válida.
+Ejemplo:
+c
+Copiar código
+int *p = NULL;
+if (p == NULL) {
+    printf("El puntero no apunta a nada\n");
+}
+@ejemplo: Uso de puntero NULL para comprobar si el puntero está vacío.
+
+6. Arreglos en C
+Un arreglo (o array) es una colección de elementos del mismo tipo almacenados en memoria de forma secuencial. Los elementos del arreglo se acceden mediante un índice.
+
+Ejemplo de declaración de arreglo unidimensional:
+c
+Copiar código
+int arreglo[5] = {10, 20, 30, 40, 50};
+Acceso a elementos del arreglo:
+c
+Copiar código
+printf("El primer elemento es: %d\n", arreglo[0]);
+@ejemplo: Declaración y acceso a elementos de un arreglo.
+
+7. Arreglos Multidimensionales
+Un arreglo multidimensional (o matriz) es un arreglo de arreglos. Los más comunes son las matrices bidimensionales.
+
+Ejemplo de matriz bidimensional:
+c
+Copiar código
+int matriz[2][3] = {
+    {1, 2, 3},
+    {4, 5, 6}
+};
+Para acceder a un elemento:
+
+c
+Copiar código
+printf("Elemento en fila 1, columna 2: %d\n", matriz[1][2]);  // Imprime 6
+@ejemplo: Declaración y acceso a una matriz bidimensional.
+
+8. Operaciones con Arreglos
+Asignación entre arreglos:
+En C, no es posible asignar un arreglo completo a otro arreglo directamente. En su lugar, se debe copiar elemento por elemento.
+
+Ejemplo de copia de arreglo:
+c
+Copiar código
+int a1[10], a2[10];
+for (int i = 0; i < 10; i++) {
+    a2[i] = a1[i];
+}
+@ejemplo: Ejemplo de copia de arreglos.
+
+9. Preguntas Frecuentes (FAQs)
+Pregunta: ¿Qué es un puntero en C?
+Respuesta: Un puntero es una variable que almacena la dirección de memoria de otra variable.
+
+Pregunta: ¿Cómo funciona la aritmética de punteros?
+Respuesta: La aritmética de punteros permite modificar la dirección almacenada en un puntero, dependiendo del tipo de dato al que apunta.
+
+Pregunta: ¿Qué diferencia hay entre un arreglo y un puntero?
+Respuesta: Un arreglo es un conjunto de elementos del mismo tipo almacenados secuencialmente. Un puntero es una variable que puede apuntar a una dirección específica, como la dirección de un arreglo.
+
+10. Errores Comunes y Soluciones
+Error Común: No inicializar un puntero
+Solución: Siempre inicializa un puntero antes de usarlo, ya sea asignando una dirección válida o NULL.
+
+c
+Copiar código
+int *p = NULL;
+@tema: Punteros y Arreglos en C
+@etiquetas: punteros, arreglos, aritmética de punteros, matrices, operaciones con arreglos, errores comunes, FAQs
+--- FIN UNIDAD 5 ---
+
+--- COMIENZO UNIDAD 6: Estructuras ---
+Guía de Programación en C - Estructuras
+@tema: Estructuras en C
+@etiquetas: estructuras, declaración, inicialización, arrays, almacenamiento, recuperación
+
+1. Concepto de Estructuras
+Las estructuras en C permiten agrupar variables de distintos tipos bajo una misma entidad. Son útiles cuando se necesita almacenar diferentes tipos de datos relacionados, como en la creación de registros para bases de datos.
+
+Ejemplo de estructura:
+c
+Copiar código
+struct legajo {
+    int edad;
+    char nombre[50];
+    float sueldo;
+};
+En este ejemplo, se agrupan variables de diferentes tipos (int, char[], float) bajo la estructura legajo.
+
+@ejemplo: Ejemplo de definición básica de estructura.
+
+2. Declaración e Inicialización de Estructuras
+Para definir una estructura en C, se usa la palabra clave struct, seguida del nombre de la estructura y las variables que la componen.
+
+Ejemplo de declaración:
+c
+Copiar código
+struct legajo {
+    int edad;
+    char nombre[50];
+    float sueldo;
+} legajo_vendedor, legajo_programador;
+En este caso, se declaran dos variables legajo_vendedor y legajo_programador de tipo struct legajo.
+
+Inicialización de estructuras:
+Las estructuras también pueden ser inicializadas al momento de su declaración:
+
+c
+Copiar código
+struct legajo legajo_vendedor = {40, "Juan Eneene", 1200.50};
+@ejemplo: Ejemplo de inicialización de una estructura en su declaración.
+
+3. Almacenamiento y Recuperación de Información en Estructuras
+Para acceder a los miembros de una estructura, se utiliza el operador punto (.). Cada miembro se trata como una variable independiente y puede ser utilizado en operaciones matemáticas o lógicas.
+
+Ejemplo de acceso a miembros de una estructura:
+c
+Copiar código
+struct legajo {
+    int edad;
+    char nombre[50];
+    float sueldo;
+};
+
+legajo_vendedor.edad = 35;        // Asigna valor al miembro 'edad'
+printf("Edad: %d\n", legajo_vendedor.edad);  // Imprime el valor de 'edad'
+@ejemplo: Uso del operador punto para acceder a los miembros de una estructura.
+
+4. Arreglos de Estructuras
+Las estructuras también pueden organizarse en arrays. Esto permite almacenar múltiples registros o datos estructurados de manera ordenada.
+
+Ejemplo de arreglo de estructuras:
+c
+Copiar código
+typedef struct {
+    char material[50];
+    int existencia;
+    double costo_unitario;
+} Item;
+
+Item stock[100];  // Arreglo de 100 elementos del tipo Item
+Inicialización de un arreglo de estructuras:
+c
+Copiar código
+Item stock[] = {
+    {"tornillos", 120, 0.15},
+    {"tuercas", 200, 0.09},
+    {"arandelas", 90, 0.01}
+};
+@ejemplo: Ejemplo de un arreglo de estructuras inicializado.
+
+5. Operaciones con Estructuras
+Las estructuras pueden pasarse como parámetros a funciones, y también pueden ser retornadas. Además, las estructuras pueden contener otras estructuras, lo que permite un mayor nivel de organización de datos.
+
+Ejemplo de paso de estructuras a funciones:
+c
+Copiar código
+#include <stdio.h>
+
+struct direccion {
+    char calle[25];
+    int numero;
+};
+
+void mostrarDireccion(struct direccion d) {
+    printf("Calle: %s, Número: %d\n", d.calle, d.numero);
+}
+
+int main() {
+    struct direccion dir = {"Av. Alemania", 2012};
+    mostrarDireccion(dir);
+    return 0;
+}
+@ejemplo: Ejemplo de cómo pasar una estructura a una función como parámetro.
+
+6. Arreglos Multidimensionales de Estructuras
+Un array multidimensional de estructuras se declara de manera similar a un array unidimensional, pero permite almacenar elementos en una tabla o matriz.
+
+Ejemplo de declaración de arreglo multidimensional de estructuras:
+c
+Copiar código
+typedef struct {
+    int x;
+    int y;
+} Punto;
+
+Punto matriz_puntos[3][3];  // Matriz de 3x3 puntos
+@ejemplo: Ejemplo de matriz de estructuras.
+
+7. Preguntas Frecuentes (FAQs)
+Pregunta: ¿Cómo se accede a un miembro de una estructura en C?
+Respuesta: Se accede utilizando el operador punto (.). Por ejemplo: estructura.miembro.
+
+Pregunta: ¿Es posible tener un array de estructuras en C?
+Respuesta: Sí, un array de estructuras puede contener múltiples instancias de la estructura, accesibles mediante índices.
+
+Pregunta: ¿Se pueden pasar estructuras como parámetros en funciones?
+Respuesta: Sí, las estructuras pueden pasarse como parámetros a funciones y también pueden ser retornadas.
+
+8. Errores Comunes y Soluciones
+Error Común: No inicializar todos los miembros de una estructura
+Solución: Asegúrate de inicializar todos los miembros de la estructura al declararla.
+
+c
+Copiar código
+struct legajo legajo_vendedor = {40, "Juan Eneene", 1200.50};  // Correcto
+@tema: Estructuras en C
+@etiquetas: estructuras, arrays de estructuras, operadores, errores comunes, FAQs
+--- FIN UNIDAD 6 ---
+
+--- COMIENZO UNIDAD 7:Control de Periféricos ---
+Guía de Programación en C - Control de Periféricos
+@tema: Control de Periféricos en C
+@etiquetas: periféricos, control, comunicación serie, comunicación paralelo, puertos, manejo periféricos
+
+1. Conceptos Básicos sobre Periféricos
+Los periféricos son dispositivos externos que permiten la interacción con una computadora, encargándose de tareas como entrada y salida de datos, almacenamiento y recuperación de información.
+
+Ejemplos de periféricos:
+Teclado
+Monitor
+Impresora
+Puertos de comunicación (serie y paralelo)
+@ejemplo: Ejemplos de periféricos comunes en una computadora.
+
+2. Periféricos Típicos y Clasificación
+Los periféricos pueden clasificarse en periféricos lentos (como las impresoras) y periféricos rápidos (como los discos rígidos), en función de la tasa de transferencia de datos. Cada periférico tiene sus propios métodos de manejo, definidos por el fabricante o estandarizados por normas.
+
+@ejemplo: Ejemplo de periféricos lentos y rápidos según su tasa de transferencia.
+
+3. Puertos Paralelos
+Comunicación en paralelo:
+En la comunicación en paralelo, varios bits de datos se envían simultáneamente a través de múltiples líneas de transmisión, lo que permite una mayor velocidad en la transferencia de datos.
+
+Ejemplo de puerto paralelo (DB-25):
+Conector de 25 pines, común en impresoras.
+Ejemplo de código en C para manejar un puerto paralelo:
+c
+Copiar código
+#include <stdio.h>
+#include <dos.h>
+
+void main() {
+    unsigned char byte;
+    printf("Introduce el byte que se enviará al puerto: ");
+    scanf("%u", &byte);
+    outportb(0x378, byte);  // Enviar un byte al puerto paralelo
+}
+@ejemplo: Ejemplo básico de envío de datos mediante el puerto paralelo.
+
+4. Puertos Serie
+Comunicación en serie:
+En la comunicación en serie, los datos se transmiten un bit a la vez a través de una única línea. Este método es más lento que la comunicación en paralelo, pero permite transmisiones de mayor distancia con menor interferencia.
+
+Ejemplo de código en C para manejar un puerto serie:
+c
+Copiar código
+#include <stdio.h>
+#include <dos.h>
+
+void main() {
+    outportb(0x2FB, 0x83);  // Configuración del puerto COM2
+    outportb(0x2F8, 'A');   // Enviar el carácter 'A'
+}
+@ejemplo: Ejemplo de configuración y envío de datos por el puerto serie.
+
+5. Manejo de Periféricos en C
+El lenguaje C es muy adecuado para el manejo de periféricos, ya que permite un acceso de bajo nivel a las direcciones de entrada/salida y a los registros de control de los dispositivos.
+
+Funciones para el control de puertos:
+Envío de datos:
+
+c
+Copiar código
+void outportb(unsigned portid, unsigned char value);
+Lectura de datos:
+
+c
+Copiar código
+unsigned char inportb(unsigned portid);
+@ejemplo: Ejemplo de uso de funciones inportb() y outportb() para la lectura y escritura de datos en los puertos.
+
+6. Ejemplo Completo: Comunicación Serie en C
+Programa que envía y recibe datos a través del puerto COM2:
+c
+Copiar código
+#include <stdio.h>
+#include <dos.h>
+
+void main() {
+    outportb(0x2FB, 0x83);  // Configurar puerto COM2
+    for (;;) {
+        if ((inportb(0x2FD) & 0x01) == 0x01) {  // Leer datos recibidos
+            printf("%c", inportb(0x2F8));  // Imprimir en pantalla
+        }
+        if ((inportb(0x2FD) & 0x20) == 0x20) {  // Enviar datos
+            outportb(0x2F8, 'A');
+        }
+    }
+}
+Este programa envía el carácter 'A' por el puerto COM2 y muestra cualquier dato recibido en la pantalla.
+
+@ejemplo: Ejemplo de programa que envía y recibe datos en comunicación serie.
+
+7. Preguntas Frecuentes (FAQs)
+Pregunta: ¿Cuál es la diferencia entre un puerto serie y un puerto paralelo?
+Respuesta: Un puerto serie transmite los datos un bit a la vez, mientras que un puerto paralelo envía varios bits simultáneamente a través de varias líneas.
+
+Pregunta: ¿Cómo se configura un puerto serie en C?
+Respuesta: Se usa la función outportb() para escribir en los registros del puerto y configurar la velocidad de transmisión y los parámetros de control.
+
+8. Errores Comunes y Soluciones
+Error Común: No verificar el estado del puerto antes de enviar o recibir datos
+Solución: Siempre verifica el estado del puerto utilizando los registros adecuados antes de realizar una operación de entrada o salida.
+
+c
+Copiar código
+if ((inportb(0x2FD) & 0x20) == 0x20) {
+    outportb(0x2F8, 'A');  // Enviar solo si el puerto está disponible
+}
+@ejemplo: Ejemplo de verificación del estado del puerto antes de enviar datos.
+
+@tema: Control de Periféricos en C
+@etiquetas: puertos, serie, paralelo, manejo periféricos, programación en C, errores comunes, FAQs
+--- FIN UNIDAD 7 ---
