@@ -1,5 +1,8 @@
 # Ignorar el entorno virtual
 env/
+Versiones viejas/
+
+.env
 
 # Archivos de caché y configuraciones locales
 __pycache__/
