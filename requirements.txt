@@ -67,3 +67,4 @@ watchdog==4.0.2
 yarl==1.13.1
 langchain-community
 openai
+tiktoken
