@@ -11,17 +11,18 @@ from langchain.chat_models import ChatOpenAI
 from langchain.chains.question_answering import load_qa_chain
 from dotenv import load_dotenv
 
-if os.path.exists(".env"):
-    load_dotenv()
+# Cargar clave API de st.secrets en Streamlit Cloud, o desde .env en local
+if "OPENAI_API_KEY" in st.secrets:
+    api_key = st.secrets["OPENAI_API_KEY"]
+else:
+    api_key = os.getenv('OPENAI_API_KEY')
 
-api_key = os.getenv('OPENAI_API_KEY')
-os.environ["OPENAI_API_KEY"] = api_key
-
+# Verificar si la clave de API está presente
 if api_key is None:
-    try:
-        api_key = st.secrets["OPENAI_API_KEY"]  # Para producción en Streamlit Cloud
-    except KeyError:
-        raise ValueError("API Key de OpenAI no encontrada en el entorno local ni en Streamlit Secrets")
+    raise ValueError("No se encontró 'OPENAI_API_KEY'. Asegúrate de que esté definida correctamente en los secretos o en .env.")
+
+# Asignar la clave a las variables de entorno
+os.environ["OPENAI_API_KEY"] = api_key
 
 def cargar_documentos():
     loader = TextLoader("unidades_completas.txt", encoding='utf-8')
