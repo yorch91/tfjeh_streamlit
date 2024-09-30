@@ -11,9 +11,17 @@ from langchain.chat_models import ChatOpenAI
 
 from dotenv import load_dotenv
 
-load_dotenv()
+if os.path.exists(".env"):
+    load_dotenv()
+
 api_key = os.getenv('OPENAI_API_KEY')
 os.environ["OPENAI_API_KEY"] = api_key
+
+if api_key is None:
+    try:
+        api_key = st.secrets["OPENAI_API_KEY"]  # Para producción en Streamlit Cloud
+    except KeyError:
+        raise ValueError("API Key de OpenAI no encontrada en el entorno local ni en Streamlit Secrets")
 
 # Lista de ejercicios aleatorios
 ejercicios_aleatorios = [
