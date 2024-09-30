@@ -1,0 +1,7 @@
+# Ignorar el entorno virtual
+env/
+
+# Archivos de caché y configuraciones locales
+__pycache__/
+*.pyc
+.DS_Store
