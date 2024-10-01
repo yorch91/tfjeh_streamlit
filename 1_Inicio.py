@@ -6,11 +6,11 @@ aplicar_estilos()
 
 def mostrar():
     
-    st.header("Bienvenido al Profesor Asistente de Programación en C")
+    st.header("Bienvenido al Tutor de Programacion en C para Electrónica : C-Companion")
     st.write("""
-        Este asistente está diseñado para ayudarte a aprender y practicar programación en C. 
-        Explora los diferentes menús para interactuar con el chatbot, acceder a recursos, 
-        practicar con ejercicios o autoevaluarte.
+        Este asistente está diseñado para apoyarte en el aprendizaje y la práctica de la programación en C, con un enfoque
+        en aplicaciones de electrónica. Explora los diferentes menús para interactuar con el chatbot, acceder a recursos específicos de 
+        la catedra, resolver ejercicios prácticos y autoevaluarte en tiempo real
     """)
 
 mostrar()
