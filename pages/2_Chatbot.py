@@ -44,12 +44,61 @@ chain = load_qa_chain(llm, chain_type="stuff")
 
 
 def mostrar():
-
-    
     st.header("Chatbot - Pregunta sobre programación en C")
 
     # Input del usuario para su pregunta
     user_query = st.text_input("Ingresa tu pregunta sobre programación en C:", key="user_query_input")
+
+    # Botón para realizar la consulta después de validar el input
+    if st.button("Realizar consulta"):
+        # Validar que el input no esté vacío y no exceda los 50 caracteres
+        if not user_query:
+            st.warning("El campo no puede estar vacío. Por favor, ingresa una pregunta.")
+        elif len(user_query) > 50:
+            st.warning("La pregunta no debe exceder los 50 caracteres.")
+        else:
+            # Continuar con la ejecución si la validación es exitosa
+            # PromptTemplate que establece el rol del profesor y las restricciones
+            prompt_template = """
+            Eres un experto en C. Responde solo usando C, sin mencionar C++ ni características relacionadas.
+            Incluye ejemplos de código en C con scanf y printf si es posible.
+
+            Documentos:
+            {context}
+
+            Pregunta: {user_query}
+            """
+
+            # Crear el PromptTemplate
+            prompt = PromptTemplate(
+                input_variables=["context", "user_query"],
+                template=prompt_template
+            )
+
+            try:
+                # Realizar búsqueda de documentos relevantes
+                docs = db.similarity_search(user_query)
+
+                # Combinar los documentos relevantes en un solo string como contexto
+                context = "\n\n".join([doc.page_content for doc in docs])
+
+                # Crear la cadena de pregunta-respuesta usando el template
+                chain = LLMChain(llm=llm, prompt=prompt)
+
+                # Pasar el contexto (documentos) y la consulta del usuario al LLM
+                answer = chain.run(context=context, user_query=user_query)
+
+                # Si no hay respuesta o es insuficiente, mostrar un mensaje de disculpa
+                if not answer.strip():
+                    answer = "Lo siento, no tengo la información suficiente para responder esa pregunta. ¿Podrías intentar con otra pregunta?"
+
+                # Formatear la respuesta con tono respetuoso y claro
+                final_answer = f"Hola, aquí tienes la respuesta a tu pregunta:\n\n{answer}\n\nSi tienes más dudas, no dudes en preguntar."
+
+                # Mostrar la respuesta
+                st.write("Respuesta del profesor asistente:", final_answer)
+            except Exception as e:
+                st.error(f"Hubo un error al procesar tu pregunta: {e}")
 
     # Nuevo input para generar prompts
     user_topic = st.text_input("Ingresa un tema para generar prompts:", key="user_topic_input")
@@ -71,56 +120,5 @@ def mostrar():
                 st.code(prompt)
         else:
             st.warning("Por favor, ingresa un tema para generar prompts.")
-
-
-
-    if user_query:
-        # Cargar documentos utilizando la función cargar_documentos
-        db = cargar_documentos()
-        # PromptTemplate que establece el rol del profesor y las restricciones
-        prompt_template = """
-        Eres un profesor experto en el lenguaje de programación C. 
-        Responde a la pregunta proporcionada con claridad y usando únicamente el lenguaje de programación C. 
-        Evita hacer referencias a C++, cin, cout, namespaces, o características específicas de C++.
-        Siempre que sea posible agrega a tu explicacion codigo en C.
-        Además, utiliza scanf y printf para las entradas y salidas.
-        
-        Documentos relacionados:
-        {context}
-
-        Pregunta: {user_query}
-        """
-        
-        # Crear el PromptTemplate
-        prompt = PromptTemplate(
-            input_variables=["context", "user_query"],
-            template=prompt_template
-        )
-
-        try:
-            # Realizar búsqueda de documentos relevantes
-            docs = db.similarity_search(user_query)
-
-            # Combinar los documentos relevantes en un solo string como contexto
-            context = "\n\n".join([doc.page_content for doc in docs])
-
-            # Crear la cadena de pregunta-respuesta usando el template
-            chain = LLMChain(llm=llm, prompt=prompt)
-
-            # Pasar el contexto (documentos) y la consulta del usuario al LLM
-            answer = chain.run(context=context, user_query=user_query)
-
-            # Si no hay respuesta o es insuficiente, mostrar un mensaje de disculpa
-            if not answer.strip():
-                answer = "Lo siento, no tengo la información suficiente para responder esa pregunta. ¿Podrías intentar con otra pregunta?"
-
-            # Formatear la respuesta con tono respetuoso y claro
-            final_answer = f"Hola, aquí tienes la respuesta a tu pregunta:\n\n{answer}\n\nSi tienes más dudas, no dudes en preguntar."
-
-            # Mostrar la respuesta
-            st.write("Respuesta del profesor asistente:", final_answer)
-        except Exception as e:
-            st.error(f"Hubo un error al procesar tu pregunta: {e}")
-
 
 mostrar()
