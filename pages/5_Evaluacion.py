@@ -26,46 +26,36 @@ if api_key is None:
 
 # Función que carga los documentos en FAISS
 def cargar_documentos():
-    loader = TextLoader("unidades_completas.txt", encoding='utf-8')
-    documents = loader.load()
-    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-    docs = text_splitter.split_documents(documents)
-    embeddings = OpenAIEmbeddings()
-    db = FAISS.from_documents(docs, embeddings)
-    return db
+    try:
+        loader = TextLoader("unidades_completas.txt", encoding='utf-8')
+        documents = loader.load()
+        text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+        docs = text_splitter.split_documents(documents)
+        embeddings = OpenAIEmbeddings()
+        db = FAISS.from_documents(docs, embeddings)
+        return db
+    except Exception as e:
+        st.error(f"Error al cargar documentos: {e}")
+        return None
 
 # Función para generar nuevas preguntas
-# Función para generar nuevas preguntas
-def generar_nuevas_preguntas(tipo_pregunta, tema, numero_de_preguntas):
+def generar_nuevas_preguntas(user_query, numero_de_preguntas):
     db = cargar_documentos()
+    if db is None:
+        return None
 
-    # Plantillas para cada tipo de pregunta
-    prompt_template_conceptos = """
-    Eres un profesor experto en el lenguaje de programación C.
+    # Lista de temas aleatorios
+    temas_aleatorios = ["Funciones", "Punteros", "Estructuras", "Control de periféricos", "Operadores", "Manejo de memoria"]
+    preguntas_generadas = []
+
+    # Plantilla de prompt para el LLM
+    prompt_template = """
+    Eres un profesor experto en el lenguaje de programación C. 
     Evita hacer referencias a C++, cin, cout, namespaces, o características específicas de C++.
-    Genera {numero_de_preguntas} preguntas de opción múltiple sobre el siguiente tema: {tema}.
-    Incluye opciones y la respuesta correcta en formato JSON:
-    [
-        {{
-            "pregunta": "La pregunta generada.",
-            "opciones": {{
-                "A": "Opción A",
-                "B": "Opción B",
-                "C": "Opción C",
-                "D": "Opción D"
-            }},
-            "respuesta_correcta": "La letra de la opción correcta y una breve explicación."
-        }},
-        ...
-    ]
-    Documentos relacionados:
-    {context}
-    """
-
-    prompt_template_codigo = """
-    Eres un profesor experto en el lenguaje de programación C.
-    Genera {numero_de_preguntas} preguntas del tipo "¿Cuál es la salida de este código?" sobre el tema: {tema}.
-    Incluye el código en un bloque:
+    Genera {numero_de_preguntas} preguntas de opción múltiple combinando el siguiente tema: {user_query} y un tema adicional: {tema_aleatorio}.
+    
+    También debes considerar la posibilidad de formular preguntas del tipo "¿Cuál es la salida de este código?". 
+    Si optas por este tipo de pregunta, incluye el código en un bloque de código de la siguiente manera:
     ```
     #include <stdio.h>
     int main() {{
@@ -73,7 +63,7 @@ def generar_nuevas_preguntas(tipo_pregunta, tema, numero_de_preguntas):
         return 0;
     }}
     ```
-    Cada pregunta debe incluir opciones y una respuesta correcta en formato JSON:
+    Cada pregunta debe incluir opciones y una respuesta correcta. El formato JSON debe ser el siguiente:
     [
         {{
             "pregunta": "La pregunta generada.",
@@ -88,56 +78,52 @@ def generar_nuevas_preguntas(tipo_pregunta, tema, numero_de_preguntas):
         }},
         ...
     ]
+    
     Documentos relacionados:
     {context}
     """
 
-    # Seleccionar el prompt según el tipo de pregunta
-    if tipo_pregunta == "Conceptos":
-        prompt_template = prompt_template_conceptos
-    else:
-        prompt_template = prompt_template_codigo
-
+    # Crear el PromptTemplate
     prompt = PromptTemplate(
-        input_variables=["context", "tema", "numero_de_preguntas"],
+        input_variables=["context", "user_query", "tema_aleatorio", "numero_de_preguntas"],
         template=prompt_template
     )
 
     try:
-        docs = db.similarity_search(tema)
-        context = "\n\n".join([doc.page_content for doc in docs])
-
-        # Validar si hay contexto suficiente
-        if not context:
-            st.warning(f"No se encontraron documentos relevantes para el tema: {tema}")
+        # Buscar documentos relevantes
+        docs = db.similarity_search(user_query)
+        if not docs:
+            st.error(f"No se encontraron documentos relevantes para el tema '{user_query}'.")
             return None
 
-        llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0.3)
+        # Combinar los documentos relevantes en un solo string como contexto
+        context = "\n\n".join([doc.page_content for doc in docs])
+
+        # Crear el LLM para generar las preguntas
+        llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
         chain = LLMChain(llm=llm, prompt=prompt)
 
-        # Ejecutar el chain y generar la respuesta
-        answer = chain.run(context=context, tema=tema, numero_de_preguntas=numero_de_preguntas)
-        print("Respuesta generada:", answer)
+        # Ejecutar la cadena pasando el contexto y los temas
+        answer = chain.run(context=context, user_query=user_query, tema_aleatorio=random.choice(temas_aleatorios), numero_de_preguntas=numero_de_preguntas)
 
-        # Validamos si la respuesta está vacía
+        # Validar la respuesta generada
         if not answer or answer.strip() == "":
             st.error("La respuesta generada está vacía o no es válida.")
             return None
 
-        # Intentamos cargarla como JSON
+        # Intentar parsear la respuesta como JSON
         try:
             preguntas = json.loads(answer)
             if not isinstance(preguntas, list):
                 raise ValueError("La respuesta no es una lista válida de preguntas.")
         except json.JSONDecodeError as e:
-            st.error(f"Hubo un error al procesar la respuesta. Detalles: {e}")
+            st.error(f"Error al procesar la respuesta: {e}. Respuesta: {answer}")
             return None
         except ValueError as ve:
-            st.error(str(ve))
+            st.error(f"Error en el formato de la respuesta: {ve}")
             return None
 
-        # Elimina preguntas duplicadas si es necesario
-        preguntas_generadas = []
+        # Asegurarse de que las preguntas sean distintas
         for pregunta in preguntas:
             if pregunta not in preguntas_generadas:
                 preguntas_generadas.append(pregunta)
@@ -164,45 +150,48 @@ def reiniciar_evaluacion():
 
 # Función para mostrar la página de evaluación
 def mostrar():
-    st.header("Autoevaluación")
+    st.header("Autoevaluacion")
+
+    # Inicializa el estado de la sesión para almacenar preguntas, respuestas, y la opción seleccionada
     if "preguntas" not in st.session_state:
         st.session_state["preguntas"] = []
     if "respuestas" not in st.session_state:
         st.session_state["respuestas"] = []
-    if "tema" not in st.session_state:
-        st.session_state["tema"] = ""
-    if "tipo_pregunta" not in st.session_state:
-        st.session_state["tipo_pregunta"] = "Conceptos"  # Por defecto
+    if "user_query" not in st.session_state:
+        st.session_state["user_query"] = ""
     if "numero_de_preguntas" not in st.session_state:
         st.session_state["numero_de_preguntas"] = 5
     if "validado" not in st.session_state:
         st.session_state["validado"] = False
 
-    # Selección del tipo de pregunta
-    tipo_pregunta = st.selectbox("Selecciona el tipo de pregunta:", ["Conceptos", "Salida de código"])
-    st.session_state["tipo_pregunta"] = tipo_pregunta
+    # Entrada de la consulta del usuario solo si no hay preguntas generadas
+    if not st.session_state["preguntas"]:
+        user_query = st.text_input("Ingresa un tema sobre el cual deseas recibir preguntas:")
+        st.session_state["user_query"] = user_query
 
-    # Selección del tema
-    tema = st.selectbox("Selecciona un tema:", ["Funciones", "Punteros", "Estructuras", "Control de periféricos", "Operadores", "Manejo de memoria"])
-    st.session_state["tema"] = tema
+        numero_de_preguntas = st.number_input("¿Cuántas preguntas deseas generar?", min_value=1, max_value=5, value=5)
+        st.session_state["numero_de_preguntas"] = numero_de_preguntas
 
-    numero_de_preguntas = st.number_input("¿Cuántas preguntas deseas generar?", min_value=1, max_value=5, value=5)
-    st.session_state["numero_de_preguntas"] = numero_de_preguntas
+        if st.button("Generar preguntas"):
+            if user_query.strip() == "":
+                st.error("Por favor, ingresa un tema válido para generar preguntas.")
+            else:
+                preguntas_nuevas = generar_nuevas_preguntas(st.session_state["user_query"], st.session_state["numero_de_preguntas"])
+                if preguntas_nuevas:
+                    st.session_state["preguntas"] = preguntas_nuevas
+                    st.session_state["respuestas"] = [None] * len(preguntas_nuevas)
 
-    if st.button("Generar preguntas"):
-        preguntas_nuevas = generar_nuevas_preguntas(st.session_state["tipo_pregunta"], st.session_state["tema"], st.session_state["numero_de_preguntas"])
-        if preguntas_nuevas:
-            st.session_state["preguntas"] = preguntas_nuevas
-            st.session_state["respuestas"] = [None] * len(preguntas_nuevas)
-
+    # Mostrar todas las preguntas y sus opciones
     if st.session_state["preguntas"]:
         for pregunta_idx, pregunta_actual in enumerate(st.session_state["preguntas"]):
             st.write(f"Pregunta {pregunta_idx + 1}:")
             st.write(pregunta_actual["pregunta"])
 
-            if st.session_state["tipo_pregunta"] == "Salida de código" and "codigo" in pregunta_actual:
+            # Mostrar el código si existe, en formato de bloque de código
+            if "codigo" in pregunta_actual and pregunta_actual["codigo"].strip():
                 st.code(pregunta_actual["codigo"], language='c')
 
+            # Crear una lista con las opciones formateadas
             opciones = [
                 f"A) {pregunta_actual['opciones']['A']}",
                 f"B) {pregunta_actual['opciones']['B']}",
@@ -210,24 +199,36 @@ def mostrar():
                 f"D) {pregunta_actual['opciones']['D']}"
             ]
 
-            selected_option = st.radio(f"Selecciona tu respuesta para la pregunta {pregunta_idx + 1}:", opciones, key=f"pregunta_{pregunta_idx}")
+            # Mostrar las opciones como radio buttons sin selección previa
+            selected_option = st.radio(
+                f"Selecciona tu respuesta para la pregunta {pregunta_idx + 1}:", 
+                opciones, 
+                index=0,
+                key=f"pregunta_{pregunta_idx}"
+            )
 
+            # Guardar la respuesta seleccionada (la primera letra del string es la opción)
             if selected_option:
                 st.session_state["respuestas"][pregunta_idx] = selected_option[0]
 
+        # Habilitar el botón "Validar respuestas" solo si todas las preguntas han sido respondidas
         if None not in st.session_state["respuestas"]:
             if st.button("Validar respuestas"):
                 st.session_state["validado"] = True
 
+        # Mostrar el resultado si ya se han validado las respuestas
         if st.session_state["validado"]:
             for pregunta_idx, pregunta_actual in enumerate(st.session_state["preguntas"]):
                 st.write(f"Pregunta {pregunta_idx + 1}: {pregunta_actual['pregunta']}")
                 st.write(f"Respuesta correcta: {pregunta_actual['respuesta_correcta']}")
                 st.write(f"Tu respuesta: {st.session_state['respuestas'][pregunta_idx]}")
 
+            # Mostrar resultados finales
             mostrar_resultado()
 
+            # Botón para reiniciar la evaluación
             if st.button("Reiniciar evaluación"):
                 reiniciar_evaluacion()
 
+# Ejecutar la función de mostrar
 mostrar()
