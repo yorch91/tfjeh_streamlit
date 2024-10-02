@@ -50,8 +50,8 @@ def mostrar_pagina_ejercicios():
     # Encabezado de la página
     st.header("Interpretar ejercicio y sugerencias")
 
-    # Input de ejercicio proporcionado por el usuario
-    ejercicio_usuario = st.text_area("Ingresa un ejercicio de programación en C para recibir sugerencias:")
+    # Input de ejercicio proporcionado por el usuario (máximo 100 caracteres)
+    ejercicio_usuario = st.text_area("Ingresa un ejercicio de programación en C (máx. 100 caracteres):", max_chars=100)
 
     # Botón para generar ejercicio aleatorio
     if st.button("Generar ejercicio aleatorio"):
@@ -61,18 +61,13 @@ def mostrar_pagina_ejercicios():
 
     # Si el usuario ingresa un ejercicio o se genera uno, el chatbot analiza el ejercicio
     if ejercicio_usuario:
-        # Plantilla de prompt para interpretar el ejercicio
+        # Plantilla de prompt optimizada para reducir costos
         prompt_template = """
-        Eres un profesor experto en el lenguaje de programación C. 
-        El siguiente es un ejercicio de programación que un estudiante quiere resolver:
+        Eres un profesor de C. El estudiante necesita ayuda con el siguiente ejercicio:
         {ejercicio_usuario}
-
-        Tu tarea es ayudar al estudiante a razonar sobre el ejercicio sin proporcionar directamente el código de la solución.
-        Ofrece sugerencias sobre cómo abordarlo, posibles estructuras de datos a usar, y otros puntos importantes.
-        Puedes incluir ejemplos de código que ayuden al razonamiento, pero no debes resolver el ejercicio por completo.
-        Ve desglozando el ejercicio en las partes mas importantes y a continuacion sugiere codigo y conceptos a revisar
-        Tu respuesta debe sugerir conceptos y estructuras de codigo a utilizar, pero no deben resolver el ejercicio, sino solo servir de guia
         
+        Ayúdalo a razonarlo, sugiriendo estructuras y conceptos clave, pero sin dar la solución completa.
+
         Documentos relacionados:
         {context}
         """
@@ -91,7 +86,7 @@ def mostrar_pagina_ejercicios():
             context = "\n\n".join([doc.page_content for doc in docs])
 
             # Crear el LLM para analizar el ejercicio
-            llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.7)
+            llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0.3)
             chain = LLMChain(llm=llm, prompt=prompt)
 
             # Ejecutar la cadena pasando el contexto y el ejercicio del usuario
