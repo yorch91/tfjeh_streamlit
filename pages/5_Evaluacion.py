@@ -35,6 +35,7 @@ def cargar_documentos():
     return db
 
 # Función para generar nuevas preguntas
+# Función para generar nuevas preguntas
 def generar_nuevas_preguntas(tipo_pregunta, tema, numero_de_preguntas):
     db = cargar_documentos()
 
@@ -105,17 +106,24 @@ def generar_nuevas_preguntas(tipo_pregunta, tema, numero_de_preguntas):
     try:
         docs = db.similarity_search(tema)
         context = "\n\n".join([doc.page_content for doc in docs])
+
+        # Validar si hay contexto suficiente
+        if not context:
+            st.warning(f"No se encontraron documentos relevantes para el tema: {tema}")
+            return None
+
         llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0.3)
         chain = LLMChain(llm=llm, prompt=prompt)
 
-        # Ejecuta el chain y genera la respuesta
+        # Ejecutar el chain y generar la respuesta
         answer = chain.run(context=context, tema=tema, numero_de_preguntas=numero_de_preguntas)
         print("Respuesta generada:", answer)
 
         # Validamos si la respuesta está vacía
         if not answer or answer.strip() == "":
-            raise ValueError("La respuesta generada está vacía o no es válida.")
-        
+            st.error("La respuesta generada está vacía o no es válida.")
+            return None
+
         # Intentamos cargarla como JSON
         try:
             preguntas = json.loads(answer)
