@@ -74,7 +74,7 @@ def generar_nuevas_preguntas(user_query, numero_de_preguntas):
         docs = db.similarity_search(user_query)
         context = "\n\n".join([doc.page_content for doc in docs])
 
-        llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+        llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
         chain = LLMChain(llm=llm, prompt=prompt)
         answer = chain.run(context=context, user_query=user_query, numero_de_preguntas=numero_de_preguntas)
 
@@ -138,7 +138,7 @@ def mostrar():
         user_query = st.text_input("Ingresa un tema sobre el cual deseas recibir preguntas:")
         st.session_state["user_query"] = user_query
 
-        numero_de_preguntas = st.number_input("¿Cuántas preguntas deseas generar?", min_value=1, max_value=10, value=5)
+        numero_de_preguntas = st.number_input("¿Cuántas preguntas deseas generar?", min_value=1, max_value=5, value=5)
         st.session_state["numero_de_preguntas"] = numero_de_preguntas
 
         if st.button("Generar preguntas"):
