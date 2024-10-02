@@ -45,11 +45,12 @@ def generar_nuevas_preguntas(user_query, numero_de_preguntas):
     Eres un profesor experto en el lenguaje de programación C.
     Evita hacer referencias a C++, cin, cout, namespaces, o características específicas de C++.
     Genera {numero_de_preguntas} preguntas de opción múltiple del tipo "¿Cuál es la salida de este código?".
-    Debes proporcionar el código y 4 opciones de respuesta, con una respuesta correcta. El formato JSON debe ser el siguiente:
+    Debes proporcionar el código en C y 4 opciones de respuesta, con una respuesta correcta. El formato JSON debe ser el siguiente:
     
     [
         {{
-            "pregunta": "¿Cuál es la salida del siguiente código?\n{codigo}",
+            "pregunta": "¿Cuál es la salida del siguiente código?",
+            "codigo": "El código en C debe ir aquí.",
             "opciones": {{
                 "A": "Opción A",
                 "B": "Opción B",
@@ -104,6 +105,7 @@ def mostrar_resultado():
     st.subheader("Resultados finales:")
     for idx, pregunta in enumerate(st.session_state["preguntas"]):
         st.write(f"Pregunta {idx + 1}: {pregunta['pregunta']}")
+        st.write(f"Código:\n{pregunta['codigo']}")
         st.write(f"Tu respuesta: {st.session_state['respuestas'][idx]}")
         st.write(f"Respuesta correcta: {pregunta['respuesta_correcta']}")
         if st.session_state['respuestas'][idx] == pregunta['respuesta_correcta']:
@@ -150,6 +152,7 @@ def mostrar():
     if st.session_state["preguntas"]:
         for pregunta_idx, pregunta_actual in enumerate(st.session_state["preguntas"]):
             st.write(f"Pregunta {pregunta_idx + 1}: {pregunta_actual['pregunta']}")
+            st.write(f"Código:\n{pregunta_actual['codigo']}")
 
             opciones = [
                 f"A) {pregunta_actual['opciones']['A']}",
