@@ -102,12 +102,14 @@ def generar_nuevas_preguntas(tipo_pregunta, tema, numero_de_preguntas):
         template=prompt_template
     )
 
+        
     try:
         docs = db.similarity_search(tema)
         context = "\n\n".join([doc.page_content for doc in docs])
         llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
         chain = LLMChain(llm=llm, prompt=prompt)
 
+        
         answer = chain.run(context=context, tema=tema, numero_de_preguntas=numero_de_preguntas)
         print("Respuesta generada:", answer)
 
