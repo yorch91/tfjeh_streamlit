@@ -106,34 +106,43 @@ def generar_nuevas_preguntas(tipo_pregunta, tema, numero_de_preguntas):
     try:
         docs = db.similarity_search(tema)
         context = "\n\n".join([doc.page_content for doc in docs])
-        llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+        llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0.3)
         chain = LLMChain(llm=llm, prompt=prompt)
 
         
-        answer = chain.run(context=context, tema=tema, numero_de_preguntas=numero_de_preguntas)
-        print("Respuesta generada:", answer)
-
         try:
-            preguntas = json.loads(answer)
-            if not isinstance(preguntas, list):
-                raise ValueError("La respuesta no es una lista.")
-        except json.JSONDecodeError as e:
-            st.error(f"Hubo un error al procesar la respuesta. Detalles: {e}")
+            # Ejecuta el chain y genera la respuesta
+            answer = chain.run(context=context, tema=tema, numero_de_preguntas=numero_de_preguntas)
+            print("Respuesta generada:", answer)
+        
+            # Validamos si la respuesta está vacía
+            if not answer or answer.strip() == "":
+                raise ValueError("La respuesta generada está vacía o no es válida.")
+            
+            # Intentamos cargarla como JSON
+            try:
+                preguntas = json.loads(answer)
+                if not isinstance(preguntas, list):
+                    raise ValueError("La respuesta no es una lista válida de preguntas.")
+            except json.JSONDecodeError as e:
+                st.error(f"Hubo un error al procesar la respuesta. Detalles: {e}")
+                return None
+            except ValueError as ve:
+                st.error(str(ve))
+                return None
+        
+            # Elimina preguntas duplicadas si es necesario
+            preguntas_generadas = []
+            for pregunta in preguntas:
+                if pregunta not in preguntas_generadas:
+                    preguntas_generadas.append(pregunta)
+        
+            return preguntas_generadas
+        
+        except Exception as e:
+            st.error(f"Ocurrió un error inesperado: {e}")
             return None
-        except ValueError as ve:
-            st.error(str(ve))
-            return None
 
-        preguntas_generadas = []
-        for pregunta in preguntas:
-            if pregunta not in preguntas_generadas:
-                preguntas_generadas.append(pregunta)
-
-        return preguntas_generadas
-
-    except Exception as e:
-        st.error(f"Ocurrió un error inesperado: {e}")
-        return None
     
 
 # Función para mostrar el resultado final
