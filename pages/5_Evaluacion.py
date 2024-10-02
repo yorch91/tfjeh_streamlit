@@ -9,9 +9,9 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain.document_loaders import TextLoader
 from langchain.vectorstores import FAISS
 from langchain.chat_models import ChatOpenAI
-
 from dotenv import load_dotenv
 
+# Cargar las variables de entorno
 if os.path.exists(".env"):
     load_dotenv()
 
@@ -24,56 +24,45 @@ if api_key is None:
     except KeyError:
         raise ValueError("API Key de OpenAI no encontrada en el entorno local ni en Streamlit Secrets")
 
-# Función que carga los documentos en FAISS
+# Cargar la base de datos FAISS una sola vez
 def cargar_documentos():
     loader = TextLoader("unidades_completas.txt", encoding='utf-8')
     documents = loader.load()
-    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+    text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=0)
     docs = text_splitter.split_documents(documents)
     embeddings = OpenAIEmbeddings()
     db = FAISS.from_documents(docs, embeddings)
     return db
 
+# Inicializar FAISS solo una vez
+db = cargar_documentos()
+
 # Función para generar nuevas preguntas
 def generar_nuevas_preguntas(user_query, numero_de_preguntas):
-    # Cargar la base de datos de documentos
-    db = cargar_documentos()
-
     # Lista de temas aleatorios
-    temas_aleatorios = ["Funciones", "Punteros", "Estructuras", "Control de periféricos", "Operadores", "Manejo de memoria"]
+    temas_aleatorios = ["Funciones", "Punteros", "Estructuras", "Operadores", "Manejo de memoria"]
     preguntas_generadas = []
 
-    # Plantilla de prompt para el LLM
+    # Plantilla de prompt optimizada
     prompt_template = """
-    Eres un profesor experto en el lenguaje de programación C. 
-    Evita hacer referencias a C++, cin, cout, namespaces, o características específicas de C++.
-    Genera {numero_de_preguntas} preguntas de opción múltiple combinando el siguiente tema: {user_query} y un tema adicional: {tema_aleatorio}.
-    
-    También debes considerar la posibilidad de formular preguntas del tipo "¿Cuál es la salida de este código?". 
-    Si optas por este tipo de pregunta, incluye el código en un bloque de código de la siguiente manera:
+    Eres un experto en C. Genera {numero_de_preguntas} preguntas de opción múltiple combinando el tema {user_query} con {tema_aleatorio}.
+    Si es posible, incluye preguntas de "¿Cuál es la salida de este código?" con un bloque de código C:
     ```
     #include <stdio.h>
     int main() {{
-        // Tu código aquí
+        // Código aquí
         return 0;
     }}
     ```
-    Cada pregunta debe incluir opciones y una respuesta correcta. El formato JSON debe ser el siguiente:
+    Responde en formato JSON:
     [
         {{
-            "pregunta": "La pregunta generada.",
-            "codigo": "Aquí va el código si la pregunta es sobre la salida del mismo.",
-            "opciones": {{
-                "A": "Opción A",
-                "B": "Opción B",
-                "C": "Opción C",
-                "D": "Opción D"
-            }},
-            "respuesta_correcta": "La letra de la opción correcta y una breve explicación."
+            "pregunta": "La pregunta",
+            "opciones": {{"A": "Opción A", "B": "Opción B", "C": "Opción C", "D": "Opción D"}},
+            "respuesta_correcta": "Letra de la opción correcta"
         }},
         ...
     ]
-    
     Documentos relacionados:
     {context}
     """
@@ -87,28 +76,22 @@ def generar_nuevas_preguntas(user_query, numero_de_preguntas):
     try:
         # Buscar documentos relevantes
         docs = db.similarity_search(user_query)
-
-        # Combinar los documentos relevantes en un solo string como contexto
         context = "\n\n".join([doc.page_content for doc in docs])
 
-        # Crear el LLM para generar las preguntas
+        # Crear el LLM con temperature baja
         llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
         chain = LLMChain(llm=llm, prompt=prompt)
 
         # Ejecutar la cadena pasando el contexto y los temas
         answer = chain.run(context=context, user_query=user_query, tema_aleatorio=random.choice(temas_aleatorios), numero_de_preguntas=numero_de_preguntas)
 
-        # Intentar parsear la respuesta como JSON
-        print("Respuesta generada:", answer)  # Imprimir la respuesta para depuración
+        # Parsear la respuesta como JSON
         try:
-            preguntas = json.loads(answer)  # Carga el JSON
-            if not isinstance(preguntas, list):  # Verifica que sea una lista
-                raise ValueError("La respuesta no es una lista.")
+            preguntas = json.loads(answer)
+            if not isinstance(preguntas, list):
+                raise ValueError("Respuesta no es una lista.")
         except json.JSONDecodeError as e:
-            st.error(f"Hubo un error al procesar tu pregunta: Respuesta no válida. Detalles: {e} Respuesta: {answer}")
-            return None
-        except ValueError as ve:
-            st.error(str(ve))  # Manejo de valor si no es una lista
+            st.error(f"Error al procesar la respuesta: {e}")
             return None
 
         # Asegurarse de que las preguntas sean distintas
@@ -119,16 +102,15 @@ def generar_nuevas_preguntas(user_query, numero_de_preguntas):
         return preguntas_generadas
 
     except Exception as e:
-        st.error(f"Ocurrió un error inesperado: {e}")
+        st.error(f"Error inesperado: {e}")
         return None
-    
 
 # Función para mostrar el resultado final
 def mostrar_resultado():
     correctas = sum(1 for idx, resp in enumerate(st.session_state["respuestas"]) if resp == st.session_state["preguntas"][idx]["respuesta_correcta"])
     incorrectas = len(st.session_state["respuestas"]) - correctas
 
-    st.subheader("Resultados finales:")
+    st.subheader("Resultados:")
     st.write(f"Respuestas correctas: {correctas}")
     st.write(f"Respuestas incorrectas: {incorrectas}")
 
@@ -140,7 +122,7 @@ def reiniciar_evaluacion():
 # Función para mostrar la página de evaluación
 def mostrar():
     st.header("Autoevaluacion")
-    # Inicializa el estado de la sesión para almacenar preguntas, respuestas, y la opción seleccionada
+
     if "preguntas" not in st.session_state:
         st.session_state["preguntas"] = []
     if "respuestas" not in st.session_state:
@@ -148,70 +130,50 @@ def mostrar():
     if "user_query" not in st.session_state:
         st.session_state["user_query"] = ""
     if "numero_de_preguntas" not in st.session_state:
-        st.session_state["numero_de_preguntas"] = 5  # Inicialmente, solo se usa como valor por defecto.
+        st.session_state["numero_de_preguntas"] = 3  # Limitar a 3 preguntas
     if "validado" not in st.session_state:
         st.session_state["validado"] = False
 
-    # Entrada de la consulta del usuario solo si no hay preguntas generadas
+    # Input del usuario
     if not st.session_state["preguntas"]:
-        user_query = st.text_input("Ingresa un tema sobre el cual deseas recibir preguntas:")
+        user_query = st.text_input("Ingresa un tema para recibir preguntas:", max_chars=50)
         st.session_state["user_query"] = user_query
 
-        numero_de_preguntas = st.number_input("¿Cuántas preguntas deseas generar?", min_value=1, max_value=10, value=5)
+        numero_de_preguntas = st.number_input("¿Cuántas preguntas deseas generar?", min_value=1, max_value=3, value=3)
         st.session_state["numero_de_preguntas"] = numero_de_preguntas
 
         if st.button("Generar preguntas"):
             preguntas_nuevas = generar_nuevas_preguntas(st.session_state["user_query"], st.session_state["numero_de_preguntas"])
             if preguntas_nuevas:
                 st.session_state["preguntas"] = preguntas_nuevas
-                st.session_state["respuestas"] = [None] * len(preguntas_nuevas)  # Inicializa respuestas según el número de preguntas generadas.
+                st.session_state["respuestas"] = [None] * len(preguntas_nuevas)
 
-    # Mostrar todas las preguntas y sus opciones
+    # Mostrar preguntas
     if st.session_state["preguntas"]:
         for pregunta_idx, pregunta_actual in enumerate(st.session_state["preguntas"]):
-            st.write(f"Pregunta {pregunta_idx + 1}:")
-            st.write(pregunta_actual["pregunta"])
+            st.write(f"Pregunta {pregunta_idx + 1}: {pregunta_actual['pregunta']}")
 
-            # Mostrar el código si existe, en formato de bloque de código
+            # Mostrar código si existe
             if "codigo" in pregunta_actual and pregunta_actual["codigo"].strip():
                 st.code(pregunta_actual["codigo"], language='c')
 
-            # Crear una lista con las opciones formateadas
-            opciones = [
-                f"A) {pregunta_actual['opciones']['A']}",
-                f"B) {pregunta_actual['opciones']['B']}",
-                f"C) {pregunta_actual['opciones']['C']}",
-                f"D) {pregunta_actual['opciones']['D']}"
-            ]
+            # Opciones
+            opciones = [f"{key}) {value}" for key, value in pregunta_actual['opciones'].items()]
+            selected_option = st.radio(f"Selecciona tu respuesta para la pregunta {pregunta_idx + 1}:", opciones, key=f"pregunta_{pregunta_idx}")
 
-            # Mostrar las opciones como radio buttons sin selección previa
-            selected_option = st.radio(
-                f"Selecciona tu respuesta para la pregunta {pregunta_idx + 1}:", 
-                opciones, 
-                index=0,
-                key=f"pregunta_{pregunta_idx}"
-            )
-
-            # Guardar la respuesta seleccionada (la primera letra del string es la opción)
             if selected_option:
                 st.session_state["respuestas"][pregunta_idx] = selected_option[0]
 
-        # Habilitar el botón "Validar respuestas" solo si todas las preguntas han sido respondidas
+        # Validar respuestas
         if None not in st.session_state["respuestas"]:
             if st.button("Validar respuestas"):
                 st.session_state["validado"] = True
 
-        # Mostrar el resultado si ya se han validado las respuestas
+        # Mostrar resultados
         if st.session_state["validado"]:
-            for pregunta_idx, pregunta_actual in enumerate(st.session_state["preguntas"]):
-                st.write(f"Pregunta {pregunta_idx + 1}: {pregunta_actual['pregunta']}")
-                st.write(f"Respuesta correcta: {pregunta_actual['respuesta_correcta']}")
-                st.write(f"Tu respuesta: {st.session_state['respuestas'][pregunta_idx]}")
-
-            # Mostrar resultados finales
             mostrar_resultado()
 
-            # Botón para reiniciar la evaluación
+            # Botón para reiniciar
             if st.button("Reiniciar evaluación"):
                 reiniciar_evaluacion()
 
