@@ -36,7 +36,7 @@ def cargar_documentos():
 db = cargar_documentos()
 
 # Crear el LLM de OpenAI
-llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+llm = ChatOpenAI(model_name="gpt-4", temperature=0)
 
 # Crear la cadena de pregunta-respuesta
 chain = load_qa_chain(llm, chain_type="stuff")
@@ -44,12 +44,25 @@ chain = load_qa_chain(llm, chain_type="stuff")
 # Inicializar una variable de sesión para el historial de conversación
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []
-if 'conversation_context' not in st.session_state:
-    st.session_state['conversation_context'] = ""
 
 def agregar_a_contexto(user_query, respuesta):
-    """Agrega la pregunta y respuesta al contexto de la conversación."""
-    st.session_state['conversation_context'] += f"Pregunta: {user_query}\nRespuesta: {respuesta}\n\n"
+    """Agrega la pregunta y respuesta más recientes al historial de conversación."""
+    st.session_state['chat_history'].append({"query": user_query, "answer": respuesta})
+
+def obtener_contexto_limited():
+    """Recuperar las últimas dos interacciones para mantener el contexto de la conversación."""
+    if len(st.session_state['chat_history']) > 2:
+        return st.session_state['chat_history'][-2:]  # Últimas 2 interacciones
+    else:
+        return st.session_state['chat_history']
+
+def construir_contexto():
+    """Construir un contexto compacto basado en las últimas interacciones para optimizar tokens."""
+    historial = obtener_contexto_limited()
+    contexto = ""
+    for interaction in historial:
+        contexto += f"Pregunta: {interaction['query']}\nRespuesta: {interaction['answer']}\n"
+    return contexto
 
 def mostrar():
     st.header("Chatbot - Pregunta sobre programación en C")
@@ -60,9 +73,9 @@ def mostrar():
 
     # Mensaje personalizado según el nivel de experiencia
     explanation_modifier = {
-        "Nada experimentado": "Explica con términos sencillos y ejemplos detallados.",
-        "Poco experimentado": "Explica con algo de detalle pero sin ser excesivamente técnico.",
-        "Experimentado": "Asume que el usuario tiene conocimiento intermedio de C."
+        "Nada experimentado": "Proporcione una explicación sencilla con ejemplos claros.",
+        "Poco experimentado": "Explica de forma moderada con algunos detalles técnicos.",
+        "Experimentado": "Asume conocimiento intermedio de C, proporciona respuestas concisas."
     }
 
     # Input del usuario para su pregunta
@@ -77,23 +90,23 @@ def mostrar():
             st.warning("La pregunta no debe exceder los 50 caracteres.")
         else:
             # Continuar con la ejecución si la validación es exitosa
+            # Crear el contexto con las últimas interacciones
+            conversation_history = construir_contexto()
+
             # PromptTemplate que establece el rol del profesor y las restricciones
             prompt_template = """
             Eres un experto en C. Responde solo usando C, sin mencionar C++ ni características relacionadas.
-            Incluye ejemplos de código en C con scanf y printf si es posible.
-            Además, {experience_level}
+            {experience_level}
 
             Documentos:
             {context}
 
-            Pregunta actual: {user_query}
-            Conversación anterior:
-            {conversation_history}
+            Pregunta: {user_query}
             """
 
             # Crear el PromptTemplate
             prompt = PromptTemplate(
-                input_variables=["context", "user_query", "experience_level", "conversation_history"],
+                input_variables=["context", "user_query", "experience_level"],
                 template=prompt_template
             )
 
@@ -107,13 +120,9 @@ def mostrar():
                 # Crear la cadena de pregunta-respuesta usando el template
                 chain = LLMChain(llm=llm, prompt=prompt)
 
-                # Usar el historial de la conversación para mantener el contexto
-                conversation_history = st.session_state['conversation_context']
-
                 # Pasar el contexto (documentos), la consulta del usuario y el nivel de experiencia al LLM
                 answer = chain.run(context=context, user_query=user_query, 
-                                   experience_level=explanation_modifier[level_of_experience], 
-                                   conversation_history=conversation_history)
+                                   experience_level=explanation_modifier[level_of_experience])
 
                 # Si no hay respuesta o es insuficiente, mostrar un mensaje de disculpa
                 if not answer.strip():
@@ -123,9 +132,6 @@ def mostrar():
                 final_answer = f"Hola, aquí tienes la respuesta a tu pregunta:\n\n{answer}\n\nSi tienes más dudas, no dudes en preguntar."
 
                 # Guardar el historial de conversación
-                st.session_state.chat_history.append((user_query, final_answer))
-
-                # Agregar la pregunta y respuesta al contexto de la conversación
                 agregar_a_contexto(user_query, final_answer)
 
                 # Mostrar la respuesta
@@ -136,9 +142,9 @@ def mostrar():
     # Mostrar el historial de conversación en un desplegable
     if st.session_state.chat_history:
         with st.expander("Historial de conversación"):
-            for i, (question, response) in enumerate(st.session_state.chat_history):
-                st.write(f"**Consulta {i+1}:** {question}")
-                st.write(f"**Respuesta {i+1}:** {response}")
+            for i, interaction in enumerate(st.session_state.chat_history):
+                st.write(f"**Consulta {i+1}:** {interaction['query']}")
+                st.write(f"**Respuesta {i+1}:** {interaction['answer']}")
 
     # Nuevo input para generar prompts
     user_topic = st.text_input("Ingresa un tema para generar prompts:", key="user_topic_input")
