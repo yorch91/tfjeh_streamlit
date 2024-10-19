@@ -1,6 +1,5 @@
 import os
 import streamlit as st
-
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.document_loaders import TextLoader
@@ -42,9 +41,23 @@ llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
 # Crear la cadena de pregunta-respuesta
 chain = load_qa_chain(llm, chain_type="stuff")
 
+# Inicializar una variable de sesión para el historial de conversación
+if 'chat_history' not in st.session_state:
+    st.session_state['chat_history'] = []
 
 def mostrar():
     st.header("Chatbot - Pregunta sobre programación en C")
+
+    # Seleccionar el nivel de experiencia
+    level_of_experience = st.selectbox("Selecciona tu nivel de experiencia:", 
+                                       options=["Nada experimentado", "Poco experimentado", "Experimentado"])
+
+    # Mensaje personalizado según el nivel de experiencia
+    explanation_modifier = {
+        "Nada experimentado": "Explica con términos sencillos y ejemplos detallados.",
+        "Poco experimentado": "Explica con algo de detalle pero sin ser excesivamente técnico.",
+        "Experimentado": "Asume que el usuario tiene conocimiento intermedio de C."
+    }
 
     # Input del usuario para su pregunta
     user_query = st.text_input("Ingresa tu pregunta sobre programación en C:", key="user_query_input")
@@ -62,6 +75,7 @@ def mostrar():
             prompt_template = """
             Eres un experto en C. Responde solo usando C, sin mencionar C++ ni características relacionadas.
             Incluye ejemplos de código en C con scanf y printf si es posible.
+            Además, {experience_level}
 
             Documentos:
             {context}
@@ -71,7 +85,7 @@ def mostrar():
 
             # Crear el PromptTemplate
             prompt = PromptTemplate(
-                input_variables=["context", "user_query"],
+                input_variables=["context", "user_query", "experience_level"],
                 template=prompt_template
             )
 
@@ -85,8 +99,8 @@ def mostrar():
                 # Crear la cadena de pregunta-respuesta usando el template
                 chain = LLMChain(llm=llm, prompt=prompt)
 
-                # Pasar el contexto (documentos) y la consulta del usuario al LLM
-                answer = chain.run(context=context, user_query=user_query)
+                # Pasar el contexto (documentos), la consulta del usuario y el nivel de experiencia al LLM
+                answer = chain.run(context=context, user_query=user_query, experience_level=explanation_modifier[level_of_experience])
 
                 # Si no hay respuesta o es insuficiente, mostrar un mensaje de disculpa
                 if not answer.strip():
@@ -95,10 +109,20 @@ def mostrar():
                 # Formatear la respuesta con tono respetuoso y claro
                 final_answer = f"Hola, aquí tienes la respuesta a tu pregunta:\n\n{answer}\n\nSi tienes más dudas, no dudes en preguntar."
 
+                # Guardar el historial de conversación
+                st.session_state.chat_history.append((user_query, final_answer))
+
                 # Mostrar la respuesta
                 st.write("Respuesta del profesor asistente:", final_answer)
             except Exception as e:
                 st.error(f"Hubo un error al procesar tu pregunta: {e}")
+
+    # Mostrar el historial de conversación en un desplegable
+    if st.session_state.chat_history:
+        with st.expander("Historial de conversación"):
+            for i, (question, response) in enumerate(st.session_state.chat_history):
+                st.write(f"**Consulta {i+1}:** {question}")
+                st.write(f"**Respuesta {i+1}:** {response}")
 
     # Nuevo input para generar prompts
     user_topic = st.text_input("Ingresa un tema para generar prompts:", key="user_topic_input")
