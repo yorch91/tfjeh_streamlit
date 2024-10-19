@@ -44,6 +44,12 @@ chain = load_qa_chain(llm, chain_type="stuff")
 # Inicializar una variable de sesión para el historial de conversación
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []
+if 'conversation_context' not in st.session_state:
+    st.session_state['conversation_context'] = ""
+
+def agregar_a_contexto(user_query, respuesta):
+    """Agrega la pregunta y respuesta al contexto de la conversación."""
+    st.session_state['conversation_context'] += f"Pregunta: {user_query}\nRespuesta: {respuesta}\n\n"
 
 def mostrar():
     st.header("Chatbot - Pregunta sobre programación en C")
@@ -80,12 +86,14 @@ def mostrar():
             Documentos:
             {context}
 
-            Pregunta: {user_query}
+            Pregunta actual: {user_query}
+            Conversación anterior:
+            {conversation_history}
             """
 
             # Crear el PromptTemplate
             prompt = PromptTemplate(
-                input_variables=["context", "user_query", "experience_level"],
+                input_variables=["context", "user_query", "experience_level", "conversation_history"],
                 template=prompt_template
             )
 
@@ -99,8 +107,13 @@ def mostrar():
                 # Crear la cadena de pregunta-respuesta usando el template
                 chain = LLMChain(llm=llm, prompt=prompt)
 
+                # Usar el historial de la conversación para mantener el contexto
+                conversation_history = st.session_state['conversation_context']
+
                 # Pasar el contexto (documentos), la consulta del usuario y el nivel de experiencia al LLM
-                answer = chain.run(context=context, user_query=user_query, experience_level=explanation_modifier[level_of_experience])
+                answer = chain.run(context=context, user_query=user_query, 
+                                   experience_level=explanation_modifier[level_of_experience], 
+                                   conversation_history=conversation_history)
 
                 # Si no hay respuesta o es insuficiente, mostrar un mensaje de disculpa
                 if not answer.strip():
@@ -111,6 +124,9 @@ def mostrar():
 
                 # Guardar el historial de conversación
                 st.session_state.chat_history.append((user_query, final_answer))
+
+                # Agregar la pregunta y respuesta al contexto de la conversación
+                agregar_a_contexto(user_query, final_answer)
 
                 # Mostrar la respuesta
                 st.write("Respuesta del profesor asistente:", final_answer)
