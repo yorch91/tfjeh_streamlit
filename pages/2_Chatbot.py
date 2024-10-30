@@ -7,7 +7,6 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.chat_models import ChatOpenAI
-from langchain.chains.question_answering import load_qa_chain
 from dotenv import load_dotenv
 
 # Cargar clave API de st.secrets en Streamlit Cloud, o desde .env en local
@@ -26,7 +25,7 @@ os.environ["OPENAI_API_KEY"] = api_key
 def cargar_documentos():
     loader = TextLoader("unidades_completas.txt", encoding='utf-8')
     documents = loader.load()
-    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+    text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=0)
     docs = text_splitter.split_documents(documents)
     embeddings = OpenAIEmbeddings()
     db = FAISS.from_documents(docs, embeddings)
@@ -38,9 +37,6 @@ db = cargar_documentos()
 # Crear el LLM de OpenAI
 llm = ChatOpenAI(model_name="gpt-4", temperature=0)
 
-# Crear la cadena de pregunta-respuesta
-chain = load_qa_chain(llm, chain_type="stuff")
-
 # Inicializar una variable de sesión para el historial de conversación
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []
@@ -50,14 +46,14 @@ def agregar_a_contexto(user_query, respuesta):
     st.session_state['chat_history'].append({"query": user_query, "answer": respuesta})
 
 def obtener_contexto_limited():
-    """Recuperar las últimas dos interacciones para mantener el contexto de la conversación."""
-    if len(st.session_state['chat_history']) > 2:
-        return st.session_state['chat_history'][-2:]  # Últimas 2 interacciones
+    """Recuperar la última interacción para reducir el tamaño de tokens."""
+    if len(st.session_state['chat_history']) > 1:
+        return [st.session_state['chat_history'][-1]]  # Solo última interacción
     else:
         return st.session_state['chat_history']
 
 def construir_contexto():
-    """Construir un contexto compacto basado en las últimas interacciones para optimizar tokens."""
+    """Construir un contexto compacto basado en la última interacción."""
     historial = obtener_contexto_limited()
     contexto = ""
     for interaction in historial:
@@ -98,7 +94,7 @@ def mostrar():
             Eres un experto en C. Responde solo usando C, sin mencionar C++ ni características relacionadas.
             {experience_level}
 
-            Documentos:
+            Documentos relevantes:
             {context}
 
             Pregunta: {user_query}
@@ -111,11 +107,11 @@ def mostrar():
             )
 
             try:
-                # Realizar búsqueda de documentos relevantes
+                # Realizar búsqueda de documentos relevantes, usando solo 500 caracteres de cada documento
                 docs = db.similarity_search(user_query)
 
-                # Combinar los documentos relevantes en un solo string como contexto
-                context = "\n\n".join([doc.page_content for doc in docs])
+                # Combinar los documentos relevantes en un solo string como contexto (solo hasta 2 documentos para reducir tokens)
+                context = "\n\n".join([doc.page_content[:500] for doc in docs[:2]])
 
                 # Crear la cadena de pregunta-respuesta usando el template
                 chain = LLMChain(llm=llm, prompt=prompt)
