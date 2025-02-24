@@ -35,7 +35,7 @@ def cargar_documentos():
 db = cargar_documentos()
 
 # Crear el LLM de OpenAI
-llm = ChatOpenAI(model_name="gpt-4", temperature=0)
+llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
 
 # Inicializar una variable de sesión para el historial de conversación
 if 'chat_history' not in st.session_state:
